@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: api
+    ports:
+      - 8080:8080
+    container_name: api
+    restart: unless-stopped
+    environment:
+      VIRTUAL_HOST: api.dev.yo-go.co
+      LETSENCRYPT_HOST: api.dev.yo-go.co
+      LETSENCRYPT_EMAIL: eng.falah@gmail.com
+
+  database:
+    image: mongo
+    restart: always
+    ports:
+      - '27018:27017'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin-password
+      MONGO_INITDB_DATABASE: admin
+    volumes:
+      - ./db/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+
+
+networks:
+  default:
+    external:
+      name: nginx-proxy

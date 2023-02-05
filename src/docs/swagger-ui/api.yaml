@@ -1,0 +1,347 @@
+openapi: 3.0.1
+
+info:
+  title: Zumra Task
+  description: Zumra Task
+  version: 1.0.0
+
+servers:
+  - url: 'http://localhost:8080/'
+
+
+paths:
+
+  /Vouchers:
+    post:
+      tags:
+        - Voucher
+      summary: Create Voucher with discountType, minCheckoutCost, maxDiscount, discountAmount, expirationDate, userId !
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createVoucherSchema'
+
+      responses:
+        200:
+          $ref: '#/components/responses/createVoucherSchema'
+
+    get:
+      tags:
+        - Voucher
+      summary: Get Vouchers
+      parameters:
+        - in: Query
+          name: status
+          schema:
+            type: string
+          required: false
+          description: any status (active, inActive , redeemed)
+
+        - in: Query
+          name: discountType
+          schema:
+            type: string
+          required: false
+          description: any status (fixed, percentage)
+
+      responses:
+        200:
+          $ref: '#/components/responses/getAllVouchers'
+
+  /vouchers/{id}:
+    get:
+      tags:
+        - Voucher
+      summary: Get one voucher !!!
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Numeric ID of the voucher to get
+
+      responses:
+        200:
+          $ref: '#/components/responses/getOneVoucher'
+
+    put:
+      tags:
+        - Voucher
+      summary: Update Plaza
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Numeric ID of the voucher to get
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/updateVoucherSchema'
+      responses:
+        200:
+          $ref: '#/components/responses/updateVoucherSchemaRes'
+
+  /vouchers/status/{voucherId}:
+    patch:
+      parameters:
+        - name: voucherId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Numeric ID of the voucher
+      tags:
+        - Voucher
+      summary: Updares status of a voucher
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createVoucherStatusSchema'
+
+      responses:
+        200:
+          $ref: '#/components/responses/createVoucherSchema'
+
+
+  /users/{userId}/vouchers/{voucherId}:
+    patch:
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Numeric ID of the voucher
+        - name: voucherId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Numeric ID of the voucher
+      tags:
+        - Users
+      summary: Redeem a voucher on a amount
+      responses:
+        200:
+          $ref: '#/components/responses/newTotalAmount'
+
+
+components:
+
+  responses:
+    createVoucherSchema:
+      description: Create Voucher.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/createVoucherSchema'
+
+    getAllVouchers:
+      description: Get All Plazas.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/getAllVoucherSchema'
+
+    getOneVoucher:
+      description: Get One Voucher.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/getOneVoucherSchema'
+
+    updateVoucherSchemaRes:
+          description: Update Voucher.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/updateVoucherSchema'
+
+    newTotalAmount:
+          description: Updated cost with discount.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/newTotalAmountSchema'
+
+  schemas:
+    createVoucherSchema:
+      type: object
+      properties:
+        discountType:
+          type: string
+          example: "percentage"
+        minCheckoutCost:
+          type: number
+          example: 150
+        maxDiscount:
+          type: number
+          example: 10
+        discountAmount:
+          type: number
+          example: 50
+        expirationDate:
+          type: date
+          example: "2023-2-5 22:52:00.000"
+        userId:
+          type: string
+          example: "63de1cabcce3c4a5a4a281d5"
+
+    getAllVoucherSchema:
+      type: array
+      items:
+        type: object
+        properties:
+          _id:
+            type: string
+            example: "601c558a6d5b375c14b4917d"
+          discountType:
+            type: string
+            example: "fixed"
+          minCheckoutCost:
+            type: number
+            example: 150
+          maxDiscount:
+            type: number
+            example: 10
+          discountAmount:
+            type: number
+            example: 50
+          status:
+            type: array
+            items:
+              type: object
+              properties:
+                text:
+                  type: string
+                  example: "active"
+                  enum:
+                    -active
+                    -inActive
+                    -redeem
+                createdAt:
+                  type: date
+                  example: "2023-02-04T14:43:51.317Z"
+                updatedAt:
+                  type: date
+                  example: "2023-02-04T14:43:51.317Z"
+          created_at:
+            type: date
+            example: "2021-01-18T20:51:58.116Z"
+          updated_at:
+            type: date
+            example: "2021-01-18T20:51:58.116Z"
+
+    getOneVoucherSchema:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "601c558a6d5b375c14b4917d"
+        discountType:
+          type: string
+          example: "fixed"
+        minCheckoutCost:
+          type: number
+          example: 150
+        maxDiscount:
+          type: number
+          example: 10
+        discountAmount:
+          type: number
+          example: 50
+        status:
+          type: array
+          items:
+            type: object
+            properties:
+              text:
+                type: string
+                example: "active"
+                enum:
+                  -active
+                  -inActive
+                  -redeem
+              createdAt:
+                type: date
+                example: "2023-02-04T14:43:51.317Z"
+              updatedAt:
+                type: date
+                example: "2023-02-04T14:43:51.317Z"
+        created_at:
+          type: date
+          example: "2021-01-18T20:51:58.116Z"
+        updated_at:
+          type: date
+          example: "2021-01-18T20:51:58.116Z"
+
+    updateVoucherSchema:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "601c558a6d5b375c14b4917d"
+        discountType:
+          type: string
+          example: "fixed"
+        minCheckoutCost:
+          type: number
+          example: 150
+        maxDiscount:
+          type: number
+          example: 10
+        discountAmount:
+          type: number
+          example: 50
+        status:
+          type: array
+          items:
+            type: object
+            properties:
+              text:
+                type: string
+                example: "active"
+                enum:
+                  -active
+                  -inActive
+                  -redeem
+              createdAt:
+                type: date
+                example: "2023-02-04T14:43:51.317Z"
+              updatedAt:
+                type: date
+                example: "2023-02-04T14:43:51.317Z"
+        created_at:
+          type: date
+          example: "2021-01-18T20:51:58.116Z"
+        updated_at:
+          type: date
+          example: "2021-01-18T20:51:58.116Z"
+
+    createVoucherStatusSchema:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+
+            status:
+              type: string
+              example: "active"
+
+
+    newTotalAmountSchema:
+      type: object
+      properties:
+        totalCostAfterDiscount:
+          type: number
+          example: 1490

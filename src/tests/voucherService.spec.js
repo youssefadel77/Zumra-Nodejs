@@ -154,7 +154,6 @@ describe('VoucherService', () => {
         await voucherService.findById(data);
         throw new Error('Test not passed');
       } catch (error) {
-        console.log(error);
         expect(error.message).toBe('There is no voucher with that ID');
         expect(error.status).toBe(404);
       }
@@ -179,7 +178,6 @@ describe('VoucherService', () => {
         await voucherService.redeem(data);
         throw new Error('Test not passed');
       } catch (error) {
-        console.log(error);
         expect(error.message).toBe('There is no user with that ID');
         expect(error.status).toBe(404);
       }
@@ -197,7 +195,6 @@ describe('VoucherService', () => {
         await voucherService.redeem(data);
         throw new Error('Tests not passed');
       } catch (error) {
-        console.log(error);
         expect(error.message).toBe('There is no voucher with that ID or You are not allowed to redeem this voucher');
         expect(error.status).toBe(404);
       }

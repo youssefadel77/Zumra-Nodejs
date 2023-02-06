@@ -36,6 +36,7 @@ const MockVoucherGetOne = jest.fn(function (id) {
     discountType: 'percentage',
     minCheckoutCost: 150,
     maxDiscount: 50,
+    discountAmount: 10,
     expirationDate: '2023-02-05T20:52:00.000Z',
     userId: '63de1cabcce3c4a5a4a281d5',
     code: '4A9B63',
@@ -47,9 +48,12 @@ const MockVoucherGetOne = jest.fn(function (id) {
       }
     ],
     created_at: '2023-02-04T11:08:47.735Z',
-    updated_at: '2023-02-04T11:08:47.735Z'
+    updated_at: '2023-02-04T11:08:47.735Z',
+    save: jest.fn()
   };
 });
+
+const MockVoucherSave = jest.fn();
 
 const mockModels = {
   User: {
@@ -58,6 +62,7 @@ const mockModels = {
   Voucher: {
     getById: MockVoucherGetById,
     getOne: MockVoucherGetOne,
+    save: jest.fn(),
     create: function (data) {
       return { ...data, _id: '63dfb69cda30ed09cd8b7081' };
     },
@@ -199,30 +204,100 @@ describe('VoucherService', () => {
         expect(error.status).toBe(404);
       }
     });
-    // it('should make the discount and return the new cost of the order', async function () {
-    //   const data = {
-    //     totalCost: 1500,
-    //     voucherId: '63e03b27d071340dc8eac1fa',
-    //     userId: '63de1cabcce3c4a5a4a281y8'
-    //   };
-    //   const voucher = await voucherService.redeem(data);
-    //   expect(voucher.totalCostAfterDiscount).toBe(1490);
-    // });
-    // it('should throw exception because voucher already redeemed', async function () {
-    //
-    //   const data = {
-    //     totalCost: 1500,
-    //     voucherId: '63e03b27d071340dc8eac1fa',
-    //     userId: '63de1cabcce3c4a5a4a281y8'
-    //   };
-    //
-    //   try {
-    //     await voucherService.redeem(data);
-    //     throw new Error('Tests not passed');
-    //   } catch (error) {
-    //     expect(error.message).toBe('order status is redeemed and can only change to ');
-    //     expect(error.status).toBe(400);
-    //   }
-    // });
+    it('should throw exception because total cost less than minimum checkout ', async function () {
+      const data = {
+        totalCost: 100,
+        voucherId: '63e03b27d071340dc8eac1fa',
+        userId: '63de1cabcce3c4a5a4a281y8'
+      };
+      try {
+        await voucherService.redeem(data);
+        throw new Error('Tests not passed');
+      } catch (error) {
+        expect(error.message).toBe('Yor total const not reached to the minimum checkout cost');
+        expect(error.status).toBe(400);
+      }
+    });
+    it('should throw exception because voucher already redeemed', async function () {
+      MockVoucherGetOne.mockImplementationOnce(function () {
+        return {
+          _id: '63e03b27d071340dc8eac1fa',
+          discountType: 'percentage',
+          minCheckoutCost: 150,
+          maxDiscount: 50,
+          expirationDate: '2023-02-05T20:52:00.000Z',
+          userId: '63de1cabcce3c4a5a4a281d5',
+          code: '4A9B63',
+          status: [
+            {
+              text: 'redeemed',
+              createdAt: '2023-02-04T14:01:47.407Z',
+              updatedAt: '2023-02-04T14:01:47.407Z'
+            },
+            {
+              text: 'active',
+              createdAt: '2023-02-04T14:01:47.407Z',
+              updatedAt: '2023-02-04T14:01:47.407Z'
+            }
+          ],
+          created_at: '2023-02-04T11:08:47.735Z',
+          updated_at: '2023-02-04T11:08:47.735Z',
+          save: jest.fn()
+        };
+      });
+      const data = {
+        totalCost: 1500,
+        voucherId: '63e03b27d071340dc8eac1fa',
+        userId: '63de1cabcce3c4a5a4a281y8'
+      };
+
+      try {
+        await voucherService.redeem(data);
+        throw new Error('Tests not passed');
+      } catch (error) {
+        expect(error.message).toBe('order status is redeemed and can only change to ');
+        expect(error.status).toBe(400);
+      }
+    });
+    it('should redeem a  voucher and return new total cost percentage',async function () {
+      const data = {
+        totalCost: 1500,
+        voucherId: '63e0d58e8fb6d8077c08fa0d',
+        userId: '63de1cabcce3c4a5a4a281d5'
+      };
+      const result = await voucherService.redeem(data);
+      expect(result.totalCostAfterDiscount).toBe(1450);
+    });
+    it('should redeem a  voucher and return new total cost fixed', async function () {
+      MockVoucherGetOne.mockImplementationOnce(function () {
+        return {
+          _id: '63e03b27d071340dc8eac1fa',
+          discountType: 'fixed',
+          minCheckoutCost: 150,
+          maxDiscount: 50,
+          discountAmount: 10,
+          expirationDate: '2023-02-05T20:52:00.000Z',
+          userId: '63de1cabcce3c4a5a4a281d5',
+          code: '4A9B63',
+          status: [
+            {
+              text: 'active',
+              createdAt: '2023-02-04T14:01:47.407Z',
+              updatedAt: '2023-02-04T14:01:47.407Z'
+            }
+          ],
+          created_at: '2023-02-04T11:08:47.735Z',
+          updated_at: '2023-02-04T11:08:47.735Z',
+          save: jest.fn()
+        };
+      });
+      const data = {
+        totalCost: 1500,
+        voucherId: '63e0d58e8fb6d8077c08fa0d',
+        userId: '63de1cabcce3c4a5a4a281d5'
+      };
+      const result = await voucherService.redeem(data);
+      expect(result.totalCostAfterDiscount).toBe(1490);
+    });
   });
 });

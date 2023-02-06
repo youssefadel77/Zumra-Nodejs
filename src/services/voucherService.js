@@ -75,9 +75,9 @@ class VoucherService extends BaseService {
 
   async redeem(data) {
     const voucher = await this._validateUserVoucherExistence(data);
-    this._validateVoucherStatus(await voucher.getStatus(), voucherStatus.redeemed);
+    this._validateVoucherStatus(await voucher.status[0].text, voucherStatus.redeemed);
     let discountAmount = await this._getDiscountAmount(voucher, data);
-    if (data.totalCost < voucher.minCheckoutCost) throw new this.NotFoundError('Yor total const not reached to the minimum checkout cost');
+    if (data.totalCost < voucher.minCheckoutCost) throw new this.ValidationError('Yor total const not reached to the minimum checkout cost');
     if (discountAmount > voucher.maxDiscount) discountAmount = voucher.maxDiscount;
     voucher.status.unshift({
       text: voucherStatus.redeemed

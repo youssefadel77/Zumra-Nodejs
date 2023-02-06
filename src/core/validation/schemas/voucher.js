@@ -25,8 +25,8 @@ module.exports = {
     type: 'object',
     properties: {
       totalCost: { type: 'number', minimum: 10 },
-      user: { type: 'string', pattern: '^[0-9a-fA-F]{24}$' },
-      voucher: { type: 'string', pattern: '^[0-9a-fA-F]{24}$' }
+      userId: { type: 'string', pattern: '^[0-9a-fA-F]{24}$' },
+      voucherId: { type: 'string', pattern: '^[0-9a-fA-F]{24}$' }
     },
     required: ['totalCost']
   }

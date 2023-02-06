@@ -10,7 +10,7 @@ module.exports = {
     'prettier',
     'prettier/standard'
   ],
-  plugins: ['import', 'node', 'prettier', 'promise', 'standard'],
+  plugins: ['import', 'node', 'prettier', 'promise', 'standard','jest'],
   rules: {
     'import/no-relative-parent-imports': 'off',
     'import/order': 'off'

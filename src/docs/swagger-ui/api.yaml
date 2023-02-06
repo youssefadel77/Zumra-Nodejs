@@ -11,6 +11,23 @@ servers:
 
 paths:
 
+  /login:
+    post:
+      tags:
+        - Auth
+      summary: login the user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/loginSchema'
+
+      responses:
+        200:
+          $ref: '#/components/responses/loginSchema'
+
+
   /Vouchers:
     post:
       tags:
@@ -112,23 +129,20 @@ paths:
           $ref: '#/components/responses/createVoucherSchema'
 
 
-  /users/{userId}/vouchers/{voucherId}:
+  /vouchers/redeem/{voucherId}:
     patch:
       parameters:
-        - name: userId
-          in: path
-          required: true
-          schema:
-            type: string
-          description: Numeric ID of the voucher
         - name: voucherId
           in: path
           required: true
           schema:
             type: string
           description: Numeric ID of the voucher
+      security:
+        - bearerAuth: [ "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1ZmQyM2ZiNjNiNzg2NTU2OTA3NzY4ZWMiLCJyb2xlcyI6WyJhZG1pbiJdLCJpYXQiOjE2MDc2MzUzMTd9.m7qg3JfLVyBZh3n49bAPJuEOg9zWc0f7PmzZpooqY8w" ]
+
       tags:
-        - Users
+        - Voucher
       summary: Redeem a voucher on a amount
       responses:
         200:
@@ -173,12 +187,22 @@ components:
               schema:
                 $ref: '#/components/schemas/newTotalAmountSchema'
 
+    loginSchema:
+          description: login user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/logiResSchema'
+
   schemas:
     createVoucherSchema:
       type: object
       properties:
         discountType:
           type: string
+          enum:
+            -percentage
+            -fixed
           example: "percentage"
         minCheckoutCost:
           type: number
@@ -345,3 +369,35 @@ components:
         totalCostAfterDiscount:
           type: number
           example: 1490
+
+    loginSchema:
+      type: object
+      properties:
+        username:
+          type: string
+          example: "+201147726477"
+        password:
+          type: string
+          example: "1234567r"
+
+    logiResSchema:
+      type: object
+      properties:
+          token:
+            type: string
+            example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2M2RlMWNhYmNjZTNjNGE1YTRhMjgxZDUiLCJpYXQiOjE2NzU2MDY1ODJ9.1FvgPcdnq7w5fbVI35qJeelpqXHsBP5UtSYILGMMc54"
+          user:
+            type: object
+            properties:
+              _id:
+                type: string
+                example: "63de1cabcce3c4a5a4a281d5"
+              name:
+                type: string
+                example: "Youssef Adel"
+              email:
+                type: string
+                example: "youssef@zumra.com"
+              phone:
+                  type: string
+                  example: "+201147726477"

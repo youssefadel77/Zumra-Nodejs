@@ -69,7 +69,6 @@ class VoucherController extends BaseController {
   }
 
   async redeem(ctx) {
-    console.log("Here")
     ctx.request.body.userId = ctx._locals.user._id;
     ctx.request.body.voucherId = ctx.params.id;
     ctx.validate(voucherSchema.redeem, ctx.request.body);

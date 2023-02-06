@@ -5,6 +5,11 @@ const { User } = require('../../database/mongo/models');
 const { UnauthenticatedError, ValidationError } = require('../../common/errors');
 
 const findAndValidateUser = async (id) => {
+  if (id === null) {
+    return {
+      _id: null
+    };
+  }
   const user = (await User.getById(id)).toObject();
   if (!_.isNull(user)) {
     return _.set(user, '_id', String(user._id));
@@ -38,7 +43,6 @@ module.exports = () => async (ctx, next) => {
   if (jwtPayload) {
     const user = await findAndValidateUser(jwtPayload.sub);
     _.set(ctx, '_locals.user', user);
-    console.log(user);
     return next();
   }
 
